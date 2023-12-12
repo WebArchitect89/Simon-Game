@@ -10,7 +10,7 @@ var level = 0;
 
 // Check for press
 
-$(".startBtn").on("click", function () {
+$(document).on("keydown", function () {
   if (start === false) {
     nextSequence();
     $("#level-title").text(" Level " + level);
@@ -61,7 +61,7 @@ $("body").addClass("game-over");
 setTimeout(() => {
   $("body").removeClass("game-over");
 }, 200);
-$("h1").text(" You got to level " + level + ". Game Over, Press Start to Play");
+$("h1").text(" You got to level " + level + ". Game Over, Press any Key to Play");
 startOver();
 };
 };
