@@ -1,56 +1,95 @@
-// step 1 
+// Global Arrays
 
-
-// 3. At the top of the game.js file, create a new array called buttonColours and set it to hold the sequence "red", "blue", "green", "yellow" .
-
-var buttonColors = ["red", "blue", "green", "yellow"]
-
-// 5. At the top of the game.js file, create a new empty array called gamePattern.
-
+buttonColors = ["red", "blue", "green", "yellow"];
+var randomChosenColor = [];
 var gamePattern = [];
+var userClickedPattern = [];
 
+var start = false;
+var level = 0;
 
+// Check for press
 
-
-// 1. create a new function called nextSequence()
-
-
-function nextSequence (){
-// 2. Inside the new function generate a new random number between 0 and 3, and store it in a variable called randomNumber (check the random number in chrome)
-
-    var randomNumber = Math.floor(Math.random()*4);
-    console.log(randomNumber)
-    // 4. Create a new variable called randomChosenColor and use the randomNumber from step 2 to select a random colour from the buttonColours array.
-    var randomChosenColor = buttonColors[randomNumber];
-    console.log(randomChosenColor);
-    // 6. Add the new randomChosenColour generated in step 4 to the end of the gamePattern.
-    gamePattern.push(randomChosenColor);
-    console.log(gamePattern)
-
-// step 2
-
-// 1. Use jQuery to select the button with the same id as the randomChosenColour
-// 2. Use Google/Stackoverflow to figure out how you can use jQuery to animate a flash to the button selected in step 1.
-// You should end up with an effect like this:
-// 3. Use Google/Stackoverflow to figure out how you can use Javascript to play the sound for the button colour selected in step 1.
-
-var audio = new Audio("sounds/" + randomChosenColor+".mp3")
-
-$("#"+randomChosenColor).fadeOut().fadeIn()
-$("#"+randomChosenColor).on("click", function(){
-audio.play();
+$(document).on("keydown", function () {
+  if (start === false) {
+    nextSequence();
+    $("#level-title").text(" Level " + level);
+    start = !start;
+  }
 });
 
+// Function that selects the color
 
+
+function nextSequence() {
+  var randomNumber = Math.floor(Math.random() * 4);
+  randomChosenColor = buttonColors[randomNumber];
+  gamePattern.push(randomChosenColor);
+  playSound(randomChosenColor);
+  $("#level-title").text(" Level " + level);
+  // button actions
+  $("#" + randomChosenColor)
+    .fadeOut(100)
+    .fadeIn(100);
+
+  level++;
+}
+
+// Determine which buttons got clicked
+$(".btn").on("click", function () {
+  var userChosenColor = this.id;
+  userClickedPattern.push(userChosenColor);
+  checkAnswer(userClickedPattern.length - 1);
+  playSound(userChosenColor);
+  animatePress(userChosenColor);
+});
+
+// Check if the answer is correct
+
+function checkAnswer(currentLevel) {
+  if (userClickedPattern[currentLevel] === gamePattern[currentLevel]) {
+    if (userClickedPattern.length === gamePattern.length) {
+      setTimeout(() => {
+        nextSequence();
+        userClickedPattern = [];
+      }, 1000);
+    }
+  } else {
+    var wrongMove = new Audio("sounds/wrong.mp3");
+    wrongMove.play();
+$("body").addClass("game-over");
+setTimeout(() => {
+  $("body").removeClass("game-over");
+}, 200);
+$("h1").text(" You got to level " + level + " Game Over, Press Any Key to Restart");
+startOver();
+};
 };
 
-nextSequence();
 
+function startOver (){
+  level = 0;
+  gamePattern = [];
+  userClickedPattern = [];
+  start = !start;
+};
 
+// Music an animation function
+function playSound(name) {
+  $("#" + name).on("click", function () {
+    var song = new Audio("sounds/" + name + ".mp3");
+    song.play();
+  });
+}
 
+function animatePress(currentColor) {
+  $("#" + currentColor).on("click", function () {
+    $(this).addClass("pressed");
 
+    setInterval(removeClass, 100);
 
-
-
-
-
+    function removeClass() {
+      $("#" + currentColor).removeClass("pressed");
+    }
+  });
+}
